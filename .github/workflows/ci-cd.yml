@@ -57,7 +57,7 @@ jobs:
           USERNAME: ubuntu
           PORT: 3000
           CONTAINER_NAME: UNMA_BACKEND
-          ENV_FILE_PATH: /home/ubuntu/unma2025/.env/.env.production
+          ENV_FILE_PATH: /home/ubuntu/unma2025/.env
 
         uses: appleboy/ssh-action@master
         with:
