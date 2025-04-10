@@ -50,7 +50,6 @@ const OtpVerificationSchema = new mongoose.Schema({
 OtpVerificationSchema.index({ email: 1, contactNumber: 1 });
 
 // Create automatic TTL index for cleanup
-OtpVerificationSchema.index({ createdAt: 1 }, { expireAfterSeconds: 3600 });
 
 const OtpVerification = mongoose.model('OtpVerification', OtpVerificationSchema);
 

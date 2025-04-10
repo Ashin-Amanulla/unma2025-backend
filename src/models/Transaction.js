@@ -60,11 +60,9 @@ TransactionSchema.pre('save', function (next) {
 });
 
 // Create indexes for better query performance
-TransactionSchema.index({ transactionId: 1 });
 TransactionSchema.index({ registrationId: 1 });
 TransactionSchema.index({ email: 1 });
 TransactionSchema.index({ status: 1 });
-TransactionSchema.index({ createdAt: 1 });
 
 const Transaction = mongoose.model('Transaction', TransactionSchema);
 
