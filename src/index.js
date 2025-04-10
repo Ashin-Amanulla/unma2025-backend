@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 import compression from 'compression';
 import dotenv from 'dotenv';
-import loginSeedData  from './seed/login_seed_data.js';
+import loginSeedData from './seed/login_seed_data.js';
 // Load environment variables
 dotenv.config();
 
