@@ -55,7 +55,7 @@ jobs:
           LIGHTSAIL_INSTANCE_IP: ${{ secrets.LIGHTSAIL_INSTANCE_IP }}
           SSH_KEY: ${{ secrets.LIGHTSAIL_PRIVATE_KEY }}
           USERNAME: ubuntu
-          PORT: 3000
+          PORT: 3001
           CONTAINER_NAME: UNMA_BACKEND
           ENV_FILE_PATH: /home/ubuntu/unma2025/.env
 
