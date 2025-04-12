@@ -82,7 +82,7 @@ jobs:
 
             # Check if the .env.production file exists
             if [ ! -f ${{ env.ENV_FILE_PATH }} ]; then
-              echo ".env.production file is missing at ${{ env.ENV_FILE_PATH }}."
+              echo ".env file is missing at ${{ env.ENV_FILE_PATH }}."
               exit 1
             fi
 

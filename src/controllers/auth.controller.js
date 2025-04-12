@@ -3,7 +3,8 @@ import speakeasy from 'speakeasy';
 import { AppError } from '../middleware/error.js';
 import User from '../models/Admin.js';
 import { logger } from '../utils/logger.js';
-
+import dotenv from 'dotenv';
+dotenv.config();
 // JWT secret key and token expiration
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-for-development-only';
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || '24h';

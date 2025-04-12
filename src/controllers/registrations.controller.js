@@ -70,15 +70,18 @@ export const getAllRegistrations = async (req, res) => {
         const totalRegistrations = await Registration.countDocuments(query);
         const totalPages = Math.ceil(totalRegistrations / limit);
 
-        // Return results
-        res.status(200).json({
+        const response = {
             status: 'success',
             results: registrations.length,
             totalRegistrations,
             totalPages,
             currentPage: parseInt(page),
             data: registrations
-        });
+        }   
+
+        console.log("response", response);
+        // Return results
+        res.status(200).json(response);
     } catch (error) {
         logger.error(`Error getting registrations: ${error.message}`);
         res.status(500).json({

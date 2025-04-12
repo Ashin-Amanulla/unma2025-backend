@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken';
 import { logger } from '../utils/logger.js';
-
+import dotenv from 'dotenv';
+dotenv.config();
 // Constants
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
