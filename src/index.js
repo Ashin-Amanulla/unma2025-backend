@@ -86,7 +86,9 @@ app.use(errorHandler);
 
 // Start server
 app.listen(PORT, () => {
-    logger.info(`Server running on port ${PORT}`);
+    //time indian standard time
+    const indianTime = new Date().toLocaleString('en-US', { timeZone: 'Asia/Kolkata' });
+    logger.info(`Server running on port ${PORT} since ${indianTime}`);
 });
 
 
