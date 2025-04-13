@@ -46,6 +46,7 @@ export const sendWhatsAppOtp = async (phoneNumber, otp) => {
 
     try {
         const response = await axios.post(API_URL, requestBody, { headers });
+        console.log('whatsapp message sent successfully');
         return response.data;
     } catch (error) {
         console.error('Error sending WhatsApp OTP:', error.response?.data || error.message);
