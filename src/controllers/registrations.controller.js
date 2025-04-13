@@ -78,7 +78,7 @@ export const getAllRegistrations = async (req, res) => {
             totalPages,
             currentPage: parseInt(page),
             data: registrations
-        }   
+        }
 
         console.log("response", response);
         // Return results
@@ -392,14 +392,12 @@ export const sendOtp = async (req, res) => {
             });
         }
 
-        // Send OTP via email and SMS
-        // In development, just return the OTP
-        if (process.env.NODE_ENV === 'production') {
-            await Promise.all([
-                sendEmail(email, 'OTP Verification for UNMA 2025 Registration',
-                    `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 60 minutes.`),
-                    sendWhatsAppOtp(contactNumber, otp)            ]);
-        }
+
+        await Promise.all([
+            sendEmail(email, 'OTP Verification for UNMA 2025 Registration',
+                `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 60 minutes.`),
+            sendWhatsAppOtp(contactNumber, otp)]);
+
 
         logger.info(`OTP sent to ${email} and ${contactNumber}`);
 
