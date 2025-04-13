@@ -7,6 +7,7 @@ import { formatDate } from '../utils/helpers.js';
 import { Parser } from 'json2csv';
 import mongoose from 'mongoose';
 import crypto from 'crypto';
+import { sendWhatsAppOtp } from '../utils/whatsapp.js';
 
 /**
  * Get all registrations with filtering, searching, and pagination
@@ -397,8 +398,7 @@ export const sendOtp = async (req, res) => {
             await Promise.all([
                 sendEmail(email, 'OTP Verification for UNMA 2025 Registration',
                     `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 60 minutes.`),
-                sendSMS(contactNumber, `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 60 minutes.`)
-            ]);
+                    sendWhatsAppOtp(contactNumber, otp)            ]);
         }
 
         logger.info(`OTP sent to ${email} and ${contactNumber}`);
