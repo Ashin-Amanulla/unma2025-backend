@@ -834,7 +834,7 @@ export const bulkUpdateRegistrations = async (req, res) => {
 };
 
 /**
- * Save registration step
+ * Save registration steps
  * Handle multi-step form saving with partial validation
  */
 export const saveRegistrationStep = async (req, res) => {
