@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import { logger } from './logger.js';
 
-import {SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS} from '../config/config.js';
+import {SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, EMAIL_FROM} from '../config/config.js';
 
 /**
  * Generate a random OTP code
