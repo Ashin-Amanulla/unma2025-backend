@@ -1,15 +1,16 @@
 import nodemailer from 'nodemailer';
 import { logger } from './logger.js';
+import { SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, EMAIL_FROM } from '../config/config.js';
 
 // Create a transporter object
 const createTransporter = () => {
     return nodemailer.createTransport({
-        host: process.env.SMTP_HOST,
-        port: process.env.SMTP_PORT,
-        secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
+        host: SMTP_HOST,
+        port: SMTP_PORT,
+        secure: SMTP_PORT === '465', // true for 465, false for other ports
         auth: {
-            user: process.env.SMTP_USER,
-            pass: process.env.SMTP_PASS,
+            user: SMTP_USER,
+            pass: SMTP_PASS,
         },
     });
 };
@@ -20,7 +21,7 @@ export const sendEmail = async (data) => {
         const transporter = createTransporter();
 
         const mailOptions = {
-            from: process.env.EMAIL_FROM,
+            from: EMAIL_FROM,
             to: data.to,
             subject: data.subject,
             html: data.html,

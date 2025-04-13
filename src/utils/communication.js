@@ -1,6 +1,8 @@
 import nodemailer from 'nodemailer';
 import { logger } from './logger.js';
 
+import {SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS} from '../config/config.js';
+
 /**
  * Generate a random OTP code
  * @param {number} length - Length of the OTP (default: 6)
@@ -27,17 +29,17 @@ export const generateOTP = (length = 6) => {
 export const sendEmail = async (to, subject, content) => {
     try {
         const transporter = nodemailer.createTransport({
-            host: process.env.SMTP_HOST,
-            port: process.env.SMTP_PORT,
-            secure: process.env.SMTP_PORT === '465', // true for 465, false for other ports
+            host: SMTP_HOST,
+            port: SMTP_PORT,
+            secure: SMTP_PORT === '465', // true for 465, false for other ports
             auth: {
-                user: process.env.SMTP_USER,
-                pass: process.env.SMTP_PASS,
+                user: SMTP_USER,
+                pass: SMTP_PASS,
             },
         });
 
         const mailOptions = {
-            from: process.env.EMAIL_FROM || 'noreply@unma2025.org',
+            from: EMAIL_FROM || 'noreply@unma2025.org',
             to: to,
             subject: subject,
             html: content,

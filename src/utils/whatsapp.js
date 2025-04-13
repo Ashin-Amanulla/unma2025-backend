@@ -2,6 +2,7 @@ import axios from 'axios';
 import { WHATSAPP_PHONE_NUMBER_ID, FLUXCHAT_API_KEY , WHATSAPP_API_TOKEN} from '../config/config.js';
 
 export const sendWhatsAppOtp = async (phoneNumber, otp) => {
+    console.log('sending whatsapp message', WHATSAPP_PHONE_NUMBER_ID, otp);
     const API_URL = `https://fluxchat.io/api/v2/${WHATSAPP_PHONE_NUMBER_ID}/messages`;
 
     const requestBody = {
