@@ -396,8 +396,9 @@ export const sendOtp = async (req, res) => {
         await Promise.all([
             console.log('sending email',email,contactNumber),
             sendEmail(email, 'OTP Verification for UNMA 2025 Registration',
-                `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 60 minutes.`),
-            sendWhatsAppOtp(contactNumber, otp)]);
+                `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 5 minutes.`),
+            sendWhatsAppOtp(contactNumber, otp)
+        ]);
 
 
         logger.info(`OTP sent to ${email} and ${contactNumber}`);
