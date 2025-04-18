@@ -394,7 +394,7 @@ export const sendOtp = async (req, res) => {
 
 
         await Promise.all([
-            console.log('sending email',email,contactNumber),
+            console.log('sending email', email, contactNumber),
             sendEmail(email, 'OTP Verification for UNMA 2025 Registration',
                 `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 5 minutes.`),
             sendWhatsAppOtp(contactNumber, otp)
@@ -842,7 +842,6 @@ export const saveRegistrationStep = async (req, res) => {
     try {
         const { id } = req.params;
         const { step, stepData, verificationToken } = req.body;
-        console.log(step, stepData);
         // Validate step number
         if (!step || isNaN(step) || step < 1 || step > 8) {
             return res.status(400).json({
@@ -857,6 +856,40 @@ export const saveRegistrationStep = async (req, res) => {
                 status: 'error',
                 message: 'No data provided for this step'
             });
+        }
+
+        // Extract structured data
+        const { formDataStructured, ...rootLevelData } = stepData;
+
+        // Create a cleaned data object with only necessary root fields
+        const cleanedData = {
+            lastUpdated: new Date(),
+            [`step${step}Complete`]: true
+        };
+
+        // Add metadata and essential fields that need to be at root level for queries and indexing
+        if (step === 1) {
+            if (formDataStructured?.personalInfo) {
+                cleanedData.name = formDataStructured.personalInfo.name;
+                cleanedData.email = formDataStructured.personalInfo.email;
+                cleanedData.contactNumber = formDataStructured.personalInfo.contactNumber;
+                cleanedData.country = formDataStructured.personalInfo.country;
+                cleanedData.school = formDataStructured.personalInfo.school;
+                cleanedData.yearOfPassing = formDataStructured.personalInfo.yearOfPassing;
+            }
+
+            if (formDataStructured?.verification) {
+                cleanedData.emailVerified = formDataStructured.verification.emailVerified;
+                cleanedData.captchaVerified = formDataStructured.verification.captchaVerified;
+                cleanedData.verificationQuizPassed = formDataStructured.verification.quizPassed;
+            }
+        } else if (step === 3 && formDataStructured?.eventAttendance) {
+            cleanedData.isAttending = formDataStructured.eventAttendance.isAttending;
+            cleanedData.attendees = formDataStructured.eventAttendance.attendees;
+        } else if (step === 8 && formDataStructured?.financial) {
+            cleanedData.willContribute = formDataStructured.financial.willContribute;
+            cleanedData.contributionAmount = formDataStructured.financial.contributionAmount;
+            cleanedData.formSubmissionComplete = true;
         }
 
         // If ID is provided, update existing registration
@@ -880,19 +913,62 @@ export const saveRegistrationStep = async (req, res) => {
                 });
             }
 
-            // Add metadata
-            stepData.lastUpdated = new Date();
-            stepData[`step${step}Complete`] = true;
+            // Handle formDataStructured merge correctly
+            if (formDataStructured) {
+                if (!existingRegistration.formDataStructured) {
+                    cleanedData.formDataStructured = formDataStructured;
+                } else {
+                    const existingStructured = existingRegistration.formDataStructured.toObject();
 
-            // Mark registration as complete if it's the final step
-            if (step === 8) {
-                stepData.formSubmissionComplete = true;
+                    // Deep merge the formDataStructured objects by section
+                    cleanedData.formDataStructured = {
+                        verification: {
+                            ...existingStructured.verification,
+                            ...formDataStructured.verification
+                        },
+                        personalInfo: {
+                            ...existingStructured.personalInfo,
+                            ...formDataStructured.personalInfo
+                        },
+                        professional: {
+                            ...existingStructured.professional,
+                            ...formDataStructured.professional
+                        },
+                        eventAttendance: {
+                            ...existingStructured.eventAttendance,
+                            ...formDataStructured.eventAttendance
+                        },
+                        sponsorship: {
+                            ...existingStructured.sponsorship,
+                            ...formDataStructured.sponsorship
+                        },
+                        transportation: {
+                            ...existingStructured.transportation,
+                            ...formDataStructured.transportation
+                        },
+                        accommodation: {
+                            ...existingStructured.accommodation,
+                            ...formDataStructured.accommodation
+                        },
+                        optional: {
+                            ...existingStructured.optional,
+                            ...formDataStructured.optional
+                        },
+                        financial: {
+                            ...existingStructured.financial,
+                            ...formDataStructured.financial
+                        }
+                    };
+                }
             }
 
-            // Update registration with step data
+            // Set current step
+            cleanedData.currentStep = step;
+
+            // Update registration with cleaned data
             const updatedRegistration = await Registration.findByIdAndUpdate(
                 id,
-                { $set: stepData },
+                { $set: cleanedData },
                 { new: true, runValidators: true }
             );
 
@@ -911,7 +987,7 @@ export const saveRegistrationStep = async (req, res) => {
         else {
             // Verify that the first step has required fields
             if (step === 1) {
-                if (!stepData.email || !stepData.contactNumber) {
+                if (!formDataStructured?.personalInfo?.email || !formDataStructured?.personalInfo?.contactNumber) {
                     return res.status(400).json({
                         status: 'error',
                         message: 'Email and contact number are required for the first step'
@@ -920,8 +996,8 @@ export const saveRegistrationStep = async (req, res) => {
 
                 // Verify OTP verification exists
                 const otpVerification = await OtpVerification.findOne({
-                    email: stepData.email,
-                    contactNumber: stepData.contactNumber,
+                    email: formDataStructured.personalInfo.email,
+                    contactNumber: formDataStructured.personalInfo.contactNumber,
                     verified: true
                 });
 
@@ -934,12 +1010,20 @@ export const saveRegistrationStep = async (req, res) => {
 
                 // Add required fields with default values to satisfy schema requirements
                 const registrationData = {
-                    ...stepData,
+                    ...cleanedData,
+                    registrationType: formDataStructured.personalInfo.registrationType || "Alumni",
+                    name: formDataStructured.personalInfo.name,
+                    email: formDataStructured.personalInfo.email,
+                    contactNumber: formDataStructured.personalInfo.contactNumber,
+                    country: formDataStructured.personalInfo.country,
+                    school: formDataStructured.personalInfo.school,
+                    yearOfPassing: formDataStructured.personalInfo.yearOfPassing,
                     emailVerified: true, // Already verified through OTP
                     isAttending: false, // Default
                     willContribute: false, // Default
                     registrationDate: new Date(),
-                    [`step${step}Complete`]: true
+                    currentStep: 1,
+                    formDataStructured
                 };
 
                 // Create new registration

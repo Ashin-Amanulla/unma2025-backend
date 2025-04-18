@@ -19,6 +19,116 @@ const AttendeesSchema = new mongoose.Schema({
   }
 }, { _id: false });
 
+// Define schemas for the structured form data
+const VerificationSchema = new mongoose.Schema({
+  emailVerified: { type: Boolean, default: false },
+  captchaVerified: { type: Boolean, default: false },
+  quizPassed: { type: Boolean, default: false },
+  email: { type: String },
+  contactNumber: { type: String }
+}, { _id: false });
+
+const PersonalInfoSchema = new mongoose.Schema({
+  name: { type: String },
+  email: { type: String },
+  contactNumber: { type: String },
+  whatsappNumber: { type: String },
+  school: { type: String },
+  yearOfPassing: { type: String },
+  country: { type: String },
+  stateUT: { type: String },
+  district: { type: String },
+  bloodGroup: { type: String }
+}, { _id: false });
+
+const ProfessionalSchema = new mongoose.Schema({
+  profession: { type: String },
+  professionalDetails: { type: String },
+  areaOfExpertise: { type: String },
+  keySkills: { type: String }
+}, { _id: false });
+
+const EventAttendanceSchema = new mongoose.Schema({
+  isAttending: { type: Boolean, default: false },
+  attendees: { type: AttendeesSchema, default: () => ({}) },
+  eventContribution: [{ type: String }],
+  contributionDetails: { type: String },
+  eventParticipation: [{ type: String }],
+  participationDetails: { type: String }
+}, { _id: false });
+
+const SponsorshipSchema = new mongoose.Schema({
+  interestedInSponsorship: { type: Boolean, default: false },
+  sponsorshipTier: { type: String },
+  sponsorshipDetails: { type: String }
+}, { _id: false });
+
+const TransportationSchema = new mongoose.Schema({
+  startPincode: { type: String },
+  pinDistrict: { type: String },
+  pinState: { type: String },
+  pinTaluk: { type: String },
+  subPostOffice: { type: String },
+  originArea: { type: String },
+  nearestLandmark: { type: String },
+  travelDate: { type: String },
+  travelTime: { type: String },
+  modeOfTransport: { type: String },
+  readyForRideShare: { type: String },
+  rideShareCapacity: { type: Number, min: 0 },
+  needParking: { type: String },
+  wantRideShare: { type: String },
+  rideShareGroupSize: { type: Number, min: 0 },
+  travelSpecialRequirements: { type: String }
+}, { _id: false });
+
+const AccommodationSchema = new mongoose.Schema({
+  accommodation: { type: String },
+  accommodationCapacity: { type: Number, min: 0 },
+  accommodationLocation: { type: String },
+  accommodationRemarks: { type: String },
+  accommodationPincode: { type: String },
+  accommodationDistrict: { type: String },
+  accommodationState: { type: String },
+  accommodationTaluk: { type: String },
+  accommodationLandmark: { type: String },
+  accommodationSubPostOffice: { type: String },
+  accommodationArea: { type: String }
+}, { _id: false });
+
+const OptionalSchema = new mongoose.Schema({
+  spouseNavodayan: { type: String },
+  unmaFamilyGroups: { type: String },
+  mentorshipOptions: [{ type: String }],
+  trainingOptions: [{ type: String }],
+  seminarOptions: [{ type: String }],
+  tshirtInterest: { type: String },
+  tshirtSizes: { type: Map, of: Number }
+}, { _id: false });
+
+const FinancialSchema = new mongoose.Schema({
+  willContribute: { type: Boolean, default: false },
+  contributionAmount: { type: Number, min: 0, default: 0 },
+  proposedAmount: { type: Number, min: 0, default: 0 },
+  paymentStatus: { type: String },
+  paymentId: { type: String },
+  paymentDetails: { type: String },
+  paymentRemarks: { type: String }
+}, { _id: false });
+
+// Combined schema for the formDataStructured field
+const FormDataStructuredSchema = new mongoose.Schema({
+  verification: { type: VerificationSchema, default: () => ({}) },
+  personalInfo: { type: PersonalInfoSchema, default: () => ({}) },
+  professional: { type: ProfessionalSchema, default: () => ({}) },
+  eventAttendance: { type: EventAttendanceSchema, default: () => ({}) },
+  sponsorship: { type: SponsorshipSchema, default: () => ({}) },
+  transportation: { type: TransportationSchema, default: () => ({}) },
+  accommodation: { type: AccommodationSchema, default: () => ({}) },
+  optional: { type: OptionalSchema, default: () => ({}) },
+  financial: { type: FinancialSchema, default: () => ({}) }
+}, { _id: false });
+
 const RegistrationSchema = new mongoose.Schema({
   registrationType: { type: String, enum: ['Alumni', 'Staff', 'Other'], required: true },
 
@@ -29,17 +139,7 @@ const RegistrationSchema = new mongoose.Schema({
   email: { type: String, required: true },
   emailVerified: { type: Boolean, default: false, required: true },
 
-  // Common Fields
-  country: { type: String, required: true },
-  stateUT: { type: String },
-  district: { type: String },
-  captchaVerified: { type: Boolean, default: false, required: true },
-  verificationQuizPassed: { type: Boolean, default: false },
-  bloodGroup: { type: String, enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-', ''] },
-
-  // Alumni Specific Fields
-  school: { type: String },
-  yearOfPassing: { type: String },
+ 
 
   // Staff Specific Fields
   schoolsWorked: { type: String },
@@ -49,84 +149,16 @@ const RegistrationSchema = new mongoose.Schema({
   // Other Specific Fields
   purpose: { type: String },
 
-  // Professional Information
-  profession: { type: String },
-  professionalDetails: { type: String },
-  businessDetails: { type: String },
-  areaOfExpertise: { type: String },
-  keySkills: { type: String, maxlength: 500 },
 
-  // Event Attendance
-  isAttending: { type: Boolean, required: true },
-  attendees: { type: AttendeesSchema, default: () => ({}) },
-  totalVeg: { type: Number, min: 0, default: 0 },
-  totalNonVeg: { type: Number, min: 0, default: 0 },
-  eventContribution: [{ type: String }],
-  contributionDetails: { type: String },
 
-  // Sponsorship
-  interestedInSponsorship: { type: Boolean, default: false },
-  sponsorshipType: [{ type: String }],
-  sponsorshipDetails: { type: String },
-  sponsorshipTier: { type: String },
-
-  // Transportation
-  startPincode: { type: String },
-  district: { type: String },
-  state: { type: String },
-  taluk: { type: String },
-  originArea: { type: String },
-  nearestLandmark: { type: String },
-  travelDate: { type: String },
-  travelTime: { type: String },
-  modeOfTransport: { type: String },
-  travellingFrom: { type: String },
-  travelDateTime: { type: Date },
-
-  // Ride sharing
-  readyForRideShare: { type: String },
-  rideShareCapacity: { type: Number, min: 0 },
-  needParking: { type: String },
-  wantRideShare: { type: String },
-  rideShareGroupSize: { type: Number, min: 0 },
-  carPooling: { type: String, enum: ['No', 'Yes To Venue', 'Yes From Venue', 'Yes Both Ways', ''] },
-  coShareSeats: { type: Number, min: 0 },
-  landmarks: { type: String },
-  travelRemarks: { type: String },
-  travelSpecialRequirements: { type: String },
-
-  // Accommodation
-  accommodation: { type: String },
-  accommodationCapacity: { type: Number, min: 0 },
-  accommodationLocation: { type: String },
-  accommodationRemarks: { type: String },
-
-  // Financial Contribution
-  willContribute: { type: Boolean, default: false },
-  contributionAmount: { type: Number, min: 0, default: 0 },
-  proposedAmount: { type: Number, min: 0, default: 0 },
-  paymentStatus: { type: String, enum: ['Pending', 'Completed', 'Failed'], default: 'Pending' },
-  paymentId: { type: String },
-  paymentDetails: { type: String },
-  paymentRemarks: { type: String },
-
-  // Optional Fields
-  spouseNavodayan: { type: String, enum: ['', 'Yes', 'No'] },
-  unmaFamilyGroups: { type: String, enum: ['', 'Yes', 'No'] },
-  mentorshipOptions: [{ type: String }],
-  mentorshipInterest: { type: Boolean, default: false },
-  mentorshipAreas: [{ type: String }],
-  trainingOptions: [{ type: String }],
-  seminarOptions: [{ type: String }],
-  tshirtInterest: { type: String, enum: ['', 'yes', 'no'] },
-  tshirtSizes: { type: Map, of: Number },
+  // Structured form data
+  formDataStructured: { type: FormDataStructuredSchema, default: () => ({}) },
 
   // Metadata
   registrationDate: { type: Date, default: Date.now },
   lastUpdated: { type: Date, default: Date.now },
   userAgent: { type: String },
   lastUpdatedBy: { type: String },
-  registrationStatus: { type: String, enum: ['Pending', 'Approved', 'Rejected'], default: 'Pending' },
   formSubmissionComplete: { type: Boolean, default: false },
 
   // Step completion tracking
@@ -135,7 +167,10 @@ const RegistrationSchema = new mongoose.Schema({
   step3Complete: { type: Boolean, default: false },
   step4Complete: { type: Boolean, default: false },
   step5Complete: { type: Boolean, default: false },
-  currentStep: { type: Number, default: 1, min: 1, max: 5 }
+  step6Complete: { type: Boolean, default: false },
+  step7Complete: { type: Boolean, default: false },
+  step8Complete: { type: Boolean, default: false },
+  currentStep: { type: Number, default: 1, min: 1, max: 8 }
 });
 
 // Create a compound index to allow uniqueness checks on email or contactNumber
