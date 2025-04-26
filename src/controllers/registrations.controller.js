@@ -395,9 +395,9 @@ export const sendOtp = async (req, res) => {
 
         await Promise.all([
             console.log('sending email', email, contactNumber),
-            sendEmail(email, 'OTP Verification for UNMA 2025 Registration',
-                `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 5 minutes.`),
-            sendWhatsAppOtp(contactNumber, otp)
+            // sendEmail(email, 'OTP Verification for UNMA 2025 Registration',
+            //     `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 5 minutes.`),
+            // sendWhatsAppOtp(contactNumber, otp)
         ]);
 
 
@@ -841,6 +841,7 @@ export const bulkUpdateRegistrations = async (req, res) => {
 export const saveRegistrationStep = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log('sdsad',id);
         const { step, stepData, verificationToken } = req.body;
         // Validate step number
         if (!step || isNaN(step) || step < 1 || step > 8) {
@@ -867,8 +868,10 @@ export const saveRegistrationStep = async (req, res) => {
             [`step${step}Complete`]: true
         };
 
+        const emailExists = await Registration.findOne({ email: formDataStructured.personalInfo.email });
+
         // Add metadata and essential fields that need to be at root level for queries and indexing
-        if (step === 1) {
+        if (step === 1 && !emailExists) {
             if (formDataStructured?.personalInfo) {
                 cleanedData.name = formDataStructured.personalInfo.name;
                 cleanedData.email = formDataStructured.personalInfo.email;
@@ -893,17 +896,17 @@ export const saveRegistrationStep = async (req, res) => {
         }
 
         // If ID is provided, update existing registration
-        if (id && id !== 'new') {
+        if (emailExists) {
             // Validate object ID
-            if (!mongoose.Types.ObjectId.isValid(id)) {
-                return res.status(400).json({
-                    status: 'error',
-                    message: 'Invalid registration ID'
-                });
-            }
+            // if (!mongoose.Types.ObjectId.isValid(id)) {
+            //     return res.status(400).json({
+            //         status: 'error',
+            //         message: 'Invalid registration ID'
+            //     });
+            // }
 
             // Get existing registration
-            const existingRegistration = await Registration.findById(id);
+            const existingRegistration = await Registration.findOne({ email: formDataStructured.personalInfo.email });
 
             // Check if registration exists
             if (!existingRegistration) {
@@ -967,7 +970,7 @@ export const saveRegistrationStep = async (req, res) => {
 
             // Update registration with cleaned data
             const updatedRegistration = await Registration.findByIdAndUpdate(
-                id,
+                existingRegistration._id,
                 { $set: cleanedData },
                 { new: true, runValidators: true }
             );
