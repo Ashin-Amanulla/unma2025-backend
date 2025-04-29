@@ -360,6 +360,18 @@ export const sendOtp = async (req, res) => {
             });
         }
 
+        //check if email or contact number is already registered
+        const existingRegistration = await Registration.findOne({
+            $or: [{ email }, { contactNumber }]
+        });
+
+        if (existingRegistration) {
+            return res.status(400).json({
+                status: 'error',
+                message: 'Email or contact number already registered. Please raise a issue with the admin.'
+            });
+        }
+
         // Generate OTP
         const otp = generateOTP();
 
@@ -395,9 +407,9 @@ export const sendOtp = async (req, res) => {
 
         await Promise.all([
             console.log('sending email', email, contactNumber),
-            // sendEmail(email, 'OTP Verification for UNMA 2025 Registration',
-            //     `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 5 minutes.`),
-            // sendWhatsAppOtp(contactNumber, otp)
+            sendEmail(email, 'OTP Verification for UNMA 2025 Registration',
+                `Your OTP for UNMA 2025 registration is ${otp}. It will expire in 5 minutes.`),
+            sendWhatsAppOtp(contactNumber, otp)
         ]);
 
 
