@@ -1,15 +1,15 @@
-const express = require("express");
+import express from 'express';
 const router = express.Router();
-const multer = require("multer");
-const { protect, authorize } = require("../middleware/auth");
-const {
+import multer from 'multer';
+import { verifyToken, verifyAdmin } from '../middleware/auth.js'; 
+import {
     createIssue,
     getIssues,
     getIssue,
     updateIssueStatus,
     assignIssue,
     addComment,
-} = require("../controllers/issueController");
+} from "../controllers/issueController.js";
 
 // Configure multer for file uploads
 const upload = multer({
@@ -23,8 +23,8 @@ const upload = multer({
 router.post("/", upload.array("attachments", 5), createIssue);
 
 // Protected routes (admin only)
-router.use(protect);
-router.use(authorize("admin"));
+router.use(verifyToken);  // Apply token verification to the remaining routes
+router.use(verifyAdmin);
 
 router.get("/", getIssues);
 router.get("/:id", getIssue);
@@ -32,4 +32,5 @@ router.patch("/:id/status", updateIssueStatus);
 router.patch("/:id/assign", assignIssue);
 router.post("/:id/comments", addComment);
 
-module.exports = router; 
+
+export default router; 

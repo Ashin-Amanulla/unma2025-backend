@@ -1,20 +1,19 @@
-const Issue = require("../models/Issue");
-const { uploadToS3 } = require("../utils/s3Upload");
-const { validateObjectId } = require("../utils/validation");
+import Issue from "../models/Issue.js";
+// import {uploadToS3} from "../utils/s3Upload.js";
+import {validateObjectId} from "../utils/validation.js";
 
 // Create a new issue
-exports.createIssue = async (req, res) => {
+export const createIssue = async (req, res) => {
     try {
-        const { title, description, category, priority, reportedBy } = req.body;
-        const attachments = req.files || [];
+        const { title, category, priority, description, reportedBy, attachments } = req.body;
 
         // Upload attachments to S3 if any
-        const uploadedAttachments = await Promise.all(
-            attachments.map(async (file) => {
-                const { url, filename } = await uploadToS3(file);
-                return { url, filename };
-            })
-        );
+        // const uploadedAttachments = await Promise.all(
+        //     attachments.map(async (file) => {
+        //         const { url, filename } = await uploadToS3(file);
+        //         return { url, filename };
+        //     })
+        // );
 
         const issue = await Issue.create({
             title,
@@ -22,7 +21,7 @@ exports.createIssue = async (req, res) => {
             category,
             priority,
             reportedBy,
-            attachments: uploadedAttachments,
+            attachments,
         });
 
         res.status(201).json({
@@ -38,7 +37,7 @@ exports.createIssue = async (req, res) => {
 };
 
 // Get all issues (with filters and pagination)
-exports.getIssues = async (req, res) => {
+export const getIssues = async (req, res) => {
     try {
         const {
             page = 1,
@@ -87,7 +86,7 @@ exports.getIssues = async (req, res) => {
 };
 
 // Get single issue
-exports.getIssue = async (req, res) => {
+export const getIssue = async (req, res) => {
     try {
         const issue = await Issue.findById(req.params.id)
             .populate("assignedTo", "name email")
@@ -114,7 +113,7 @@ exports.getIssue = async (req, res) => {
 };
 
 // Update issue status
-exports.updateIssueStatus = async (req, res) => {
+export const updateIssueStatus = async (req, res) => {
     try {
         const { status, resolution } = req.body;
         const issue = await Issue.findById(req.params.id);
@@ -148,7 +147,7 @@ exports.updateIssueStatus = async (req, res) => {
 };
 
 // Assign issue to admin
-exports.assignIssue = async (req, res) => {
+export const assignIssue = async (req, res) => {
     try {
         const { assignedTo } = req.body;
         if (!validateObjectId(assignedTo)) {
@@ -183,7 +182,7 @@ exports.assignIssue = async (req, res) => {
 };
 
 // Add comment to issue
-exports.addComment = async (req, res) => {
+export const addComment = async (req, res) => {
     try {
         const { text } = req.body;
         const issue = await Issue.findById(req.params.id);

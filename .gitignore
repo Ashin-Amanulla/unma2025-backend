@@ -37,3 +37,5 @@ coverage/
 .npm
 .eslintcache
 .yarn-integrity 
+
+s3Upload.js

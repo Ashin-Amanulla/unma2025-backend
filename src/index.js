@@ -14,6 +14,7 @@ import authRoutes from './routes/auth.js';
 import registrationRoutes from './routes/registrations.js';
 import adminRoutes from './routes/admin.js';
 import paymentRoutes from './routes/payment.js';
+import issueRoutes from './routes/issueRoutes.js'
 // Import middlewares
 import { errorHandler, notFoundHandler } from './middleware/error.js';
 
@@ -72,6 +73,7 @@ app.use(`${baseRoutes}/auth`, authRoutes);
 app.use(`${baseRoutes}/registrations`, registrationRoutes);
 app.use(`${baseRoutes}/admin`, adminRoutes);
 app.use(`${baseRoutes}/payment`, paymentRoutes);
+app.use(`${baseRoutes}/issues`, issueRoutes);
 
 
 
