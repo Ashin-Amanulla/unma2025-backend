@@ -365,12 +365,12 @@ export const sendOtp = async (req, res) => {
             $or: [{ email }, { contactNumber }]
         });
 
-        if (existingRegistration) {
-            return res.status(400).json({
-                status: 'error',
-                message: 'Email or contact number already registered. Please raise a issue with the admin.'
-            });
-        }
+        // if (existingRegistration) {
+        //     return res.status(400).json({
+        //         status: 'error',
+        //         message: 'Email or contact number already registered. Please raise a issue with the admin.'
+        //     });
+        // }
 
         // Generate OTP
         const otp = generateOTP();
