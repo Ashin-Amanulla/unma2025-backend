@@ -38,7 +38,7 @@ app.use(helmet());
 app.use(cors());
 app.use(
     rateLimit({
-        windowMs: 15 * 60 * 1000, // 15 minutes
+        windowMs: 15 * 60 * 300, // 15 minutes
         max: 100, // limit each IP to 100 requests per windowMs
         message: {
             status: 'error',
@@ -46,6 +46,29 @@ app.use(
         }
     })
 );
+// Middleware to block unwanted paths
+app.use((req, res, next) => {
+    const blockedPaths = [
+      "/.env",
+      "/.git",
+      "/admin",
+      "/actuator",
+      "/unma"
+      // as per your log
+    ];
+    if (blockedPaths.some((path) => req.url.includes(path))) {
+      return res.status(403).send("Forbidden");
+    }
+    next();
+  });
+  app.use((req, res, next) => {
+    const ua = req.headers["user-agent"]?.toLowerCase() || "";
+    const badBots = ["zgrab", "masscan", "sqlmap", "acunetix", "nmap", "nikto"];
+    if (badBots.some((bot) => ua.includes(bot))) {
+      return res.status(403).send("Go away bot!");
+    }
+    next();
+  });
 
 // Setup request parsing middlewares
 app.use(express.json());
